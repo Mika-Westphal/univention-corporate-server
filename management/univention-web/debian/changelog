@@ -1,3 +1,9 @@
+univention-web (4.1.1-38) unstable; urgency=medium
+
+  * REVERT ME: bump version for ucs-school-5.0 scope
+
+ -- Florian Best <best@univention.de>  Mon, 05 Jul 2021 12:49:33 +0200
+
 univention-web (4.0.1-36) unstable; urgency=medium
 
   * Bug #53390: move some css vars out of theme file
