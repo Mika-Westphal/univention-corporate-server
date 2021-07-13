@@ -1,4 +1,4 @@
-#!/usr/share/ucs-test/runner python3
+#!/usr/share/ucs-test/runner pytest-3
 ## desc: Remove groups/group
 ## tags: [udm]
 ## roles: [domaincontroller_master]
@@ -11,9 +11,8 @@
 import univention.testing.utils as utils
 import univention.testing.udm as udm_test
 
-if __name__ == '__main__':
-	with udm_test.UCSTestUDM() as udm:
-		group = udm.create_group(wait_for=True)[0]
+def test_group_removal(udm):
+	group = udm.create_group(wait_for=True)[0]
 
-		udm.remove_object('groups/group', dn=group)
-		utils.verify_ldap_object(group, should_exist=False)
+	udm.remove_object('groups/group', dn=group)
+	utils.verify_ldap_object(group, should_exist=False)
