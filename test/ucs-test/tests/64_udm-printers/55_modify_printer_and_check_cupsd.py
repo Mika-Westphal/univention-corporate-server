@@ -8,6 +8,7 @@
 ##   - memberserver
 ## exposure: dangerous
 ## packages:
+##   - univention-config
 ##   - univention-printserver
 ##   - univention-directory-manager-tools
 
@@ -17,9 +18,18 @@ import univention.testing.strings as uts
 import univention.testing.ucr
 import subprocess
 import time
+import pytest
 
 
+@pytest.mark.tags('udm')
+@pytest.mark.roles('domaincontroller_master', 'domaincontroller_backup', 'domaincontroller_slave', 'memberserver')
+@pytest.mark.exposure('dangerous')
 def test_modify_printer_and_check_cupsd(ucr, udm):
+	"""Create and modify shares/printer, check if cupsd still running"""
+	# packages:
+	#   - univention-config
+	#   - univention-directory-manager-tools
+	#   - univention-printserver
 	ucr.load()
 	name = uts.random_name()
 	printer_properties = {
