@@ -1,4 +1,4 @@
-#!/usr/share/ucs-test/runner python3
+#!/usr/share/ucs-test/runner pytest-3
 ## desc: create printer for every printer URI
 ## tags: [apptest]
 ## exposure: dangerous
@@ -10,9 +10,8 @@ import re
 import subprocess
 import time
 import univention.testing.strings as uts
-import univention.testing.ucr as ucr_test
-import univention.testing.udm as udm_test
 import univention.testing.utils as utils
+import pytest
 
 
 def get_uirs():
@@ -31,31 +30,29 @@ def printer_enabled(printer_name):
 	return printer_name in out.decode('UTF-8', 'replace')
 
 
-def main():
+@pytest.mark.tags('apptest')
+@pytest.mark.exposure('dangerous')
+def test_create_printer_for_every_printer_URI(ucr, udm):
+	"""create printer for every printer URI"""
+	# packages:
+	#   - univention-printserver
 	account = utils.UCSTestDomainAdminCredentials()
-	with udm_test.UCSTestUDM() as udm:
-		with ucr_test.UCSTestConfigRegistry() as ucr:
-			position = ucr.get('ldap/hostdn').split(',', 1)[1]
-			for uri in get_uirs():
-				printer_name = uts.random_name()
-				udm.create_object(
-					modulename='shares/printer',
-					name=printer_name,
-					position='%s' % position,
-					binddn=account.binddn,
-					bindpwd=account.bindpw,
-					set={
-						'spoolHost': '%(hostname)s.%(domainname)s' % ucr,
-						'model': 'None',
-						'uri': '%s:// /tmp/%s' % (uri, printer_name)
-					}
-				)
-				if not printer_enabled(printer_name):
-					print('Wait for 30 seconds and try again')
-					time.sleep(30)
-					if not printer_enabled(printer_name):
-						utils.fail('Printer (%s) is created but not enabled' % printer_name)
-
-
-if __name__ == '__main__':
-	main()
+	position = ucr.get('ldap/hostdn').split(',', 1)[1]
+	for uri in get_uirs():
+		printer_name = uts.random_name()
+		udm.create_object(
+			modulename='shares/printer',
+			name=printer_name,
+			position='%s' % position,
+			binddn=account.binddn,
+			bindpwd=account.bindpw,
+			set={
+				'spoolHost': '%(hostname)s.%(domainname)s' % ucr,
+				'model': 'None',
+				'uri': '%s:// /tmp/%s' % (uri, printer_name)
+			}
+		)
+		if not printer_enabled(printer_name):
+			print('Wait for 30 seconds and try again')
+			time.sleep(30)
+			assert printer_enabled(printer_name), 'Printer (%s) is created but not enabled' % printer_name

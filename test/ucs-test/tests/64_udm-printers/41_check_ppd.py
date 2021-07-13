@@ -1,4 +1,4 @@
-#!/usr/share/ucs-test/runner python3
+#!/usr/share/ucs-test/runner pytest-3
 ## desc: Check PPD files
 ## tags: [udm]
 ## bugs: [43417]
@@ -18,12 +18,20 @@ from __future__ import print_function
 import os
 import sys
 import shlex
+import pytest
 import subprocess
 import univention.testing.utils as utils
 
 
-if __name__ == '__main__':
-	# get local and ldap printer models
+@pytest.mark.tags('udm')
+@pytest.mark.roles('domaincontroller_master', 'domaincontroller_backup', 'domaincontroller_slave', 'memberserver')
+@pytest.mark.exposure('safe')
+def test_check_ppd():
+	"""Create shares/printer and check if print access works"""
+	# packages:
+	#   - univention-config
+	#   - univention-directory-manager-tools
+	#   - univention-printserver
 	ldap_printer = []
 	printer_files = []
 	print('searching for printer models')
