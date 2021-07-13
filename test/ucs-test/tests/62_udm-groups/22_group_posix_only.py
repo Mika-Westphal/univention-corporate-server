@@ -1,5 +1,5 @@
 #!/usr/share/ucs-test/runner pytest-3
-## desc: Remove groups/group
+## desc: Create a group with posix option only
 ## tags: [udm]
 ## roles: [domaincontroller_master]
 ## exposure: careful
@@ -15,12 +15,10 @@ import univention.testing.utils as utils
 @pytest.mark.tags('udm')
 @pytest.mark.roles('domaincontroller_master')
 @pytest.mark.exposure('careful')
-def test_group_removal(udm):
-	"""Remove groups/group"""
+def test_group_posix_only(udm):
+	"""Create a group with posix option only"""
 	# packages:
 	#   - univention-config
 	#   - univention-directory-manager-tools
-	group = udm.create_group(wait_for=True)[0]
-
-	udm.remove_object('groups/group', dn=group)
-	utils.verify_ldap_object(group, should_exist=False)
+	group = udm.create_group(options=['posix'])[0]
+	utils.verify_ldap_object(group, {'objectClass': ['top', 'posixGroup', 'univentionGroup', 'univentionObject']})
